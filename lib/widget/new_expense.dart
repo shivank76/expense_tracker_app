@@ -2,7 +2,8 @@ import 'package:expense_tracker_app/models/expense.dart';
 import 'package:flutter/material.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.onAddExpense});
+  final void Function(Expense expense) onAddExpense;
   @override
   State<StatefulWidget> createState() {
     return _NewExpenseState();
@@ -38,11 +39,11 @@ class _NewExpenseState extends State<NewExpense> {
   }
 
   void _submitData() {
-    final _selectedAmount = double.tryParse(_amountController.text);
-    final _validAmount = _selectedAmount == null || _selectedAmount <= 0;
-    final _validTitle = _titleController.text.trim().isEmpty;
-    if (_validTitle ||
-        _validAmount ||
+    final selectedAmount = double.tryParse(_amountController.text.trim());
+    final validAmount = selectedAmount == null || selectedAmount <= 0;
+    final validTitle = _titleController.text.trim().isEmpty;
+    if (validTitle ||
+        validAmount ||
         _selectedDate == null ||
         _selectedCategory == Category.none) {
       showDialog(
@@ -61,7 +62,16 @@ class _NewExpenseState extends State<NewExpense> {
           ],
         ),
       );
+      return;
     }
+    widget.onAddExpense(
+      Expense(
+          title: _titleController.text.trim(),
+          amount: selectedAmount,
+          date: _selectedDate!,
+          category: _selectedCategory),
+    );
+    Navigator.pop(context);
   }
 
   @override
@@ -74,7 +84,7 @@ class _NewExpenseState extends State<NewExpense> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
       child: Column(
         children: [
           TextField(
