@@ -62,6 +62,7 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     Widget mainContent =
         const Center(child: Text('No Expenses! Start Adding...'));
     if (_registeredExpenses.isNotEmpty) {
@@ -77,6 +78,7 @@ class _HomeState extends State<Home> {
           IconButton(
             onPressed: () {
               showModalBottomSheet(
+                useSafeArea: true,
                 isScrollControlled: true,
                 context: context,
                 builder: (ctx) => NewExpense(
@@ -88,12 +90,21 @@ class _HomeState extends State<Home> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Chart(expenses: _registeredExpenses),
-          Expanded(child: mainContent),
-        ],
-      ),
+      body: width < 600
+          ? Column(
+              children: [
+                Chart(expenses: _registeredExpenses),
+                Expanded(child: mainContent),
+              ],
+            )
+          : Row(
+              children: [
+                Expanded(
+                  child: Chart(expenses: _registeredExpenses),
+                ),
+                Expanded(child: mainContent),
+              ],
+            ),
     );
   }
 }
